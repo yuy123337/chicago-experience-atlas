@@ -1,0 +1,5 @@
+.DS_Store
+index.generated.html
+__pycache__/
+*.pyc
+.vscode/
