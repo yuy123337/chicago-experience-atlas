@@ -1,16 +1,15 @@
 # Chicago — Experience Atlas
 
-*Hi! This is a research prototype, not a product, so
-This README tells: what it is, how the data works,
-how to keep it alive, and the things I'm still worried about.*
+*Hi! This is a research prototype, not a product — so this README is written the way I'd explain it
+to a labmate: what it is, how the data works, how to keep it alive, and what I'm still worried about.*
 
 An interactive map of Chicago places, colored **not by star rating** but by the *kind of inner
-experience* a place tends to afford: **psychologically rich**, **happy**, or **meaningful**
-(Oishi & Westgate, 2022, *Psychological Review* — please double-check the exact cite). We're not
-asking "is this place meaningful or happy ?" — we're giving place a mental short cut to take when deciding or evaluating a place, 
+experience* a place tends to afford — **psychologically rich**, **happy**, or **meaningful**
+(Oishi & Westgate, 2022, *Psychological Review* — please double-check the exact cite).
 
-asking "what does being here tend to *feel* like, in
-people's own words?" 
+We're not asking *"is this place good — happy or meaningful?"* We're offering a **mental shortcut for
+deciding where to go**: a way to evaluate a place by the experience it tends to open up in you — read
+from how visitors narrate it, in their own words.
 
 ---
 
