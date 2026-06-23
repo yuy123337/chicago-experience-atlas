@@ -116,6 +116,31 @@ So a brand-new live place **can't get a real score on the fly.** Likely resoluti
 - **Citations:** include a **References / Methods page** (both site and app) — cite Oishi & Westgate (2022) and your own method. Keeps academic integrity and separates *your* IP from cited work.
 - **Google Places ToS (T1, verify current terms):** attribution required; you may store **place IDs** long-term but generally **must not cache** other fields beyond ~30 days; can't build a competing places database from it. This shapes how the app stores live data.
 
+## 9. Accounts, storage & safety (email signup)
+
+**Where it's stored — recommend Supabase** (managed Postgres + built-in email auth, free tier):
+- `auth.users` (Supabase-managed): email + **hashed** password, email-verification, password reset. We never see/store raw passwords.
+- `profiles`: user_id → randomized handle, clan, avatar/3D-figure config, color progress. **Public identity = handle only.**
+- `feedback` / `visits`: user_id → place_id, recommend, emotions[], comment, ts. The research data.
+- Alt: Firebase (similar). Avoid rolling our own auth.
+
+**Safety checklist (T2 — confirm specifics with your IRB/security):**
+- **⚠️ IRB + consent FIRST.** Collecting narrations/emotions/location from people *for research* almost certainly needs **IRB approval, informed consent, and a privacy policy** before launch. This is the biggest item — flag to your advisor/IRB now.
+- **Email stays private.** Never expose email or real name publicly; only the randomized handle.
+- **Secret keys never ship.** App holds only Supabase's *public anon key*; the *service key* never goes in the app or GitHub. (Same lesson as the home-dir `.git` secrets risk.)
+- **Row-Level Security** so each user can only read/write their own private data.
+- **Location is sensitive** (the "last-seen, glows like Snapchat" feature = stalking risk). Make it **opt-in, coarse** (neighborhood, not exact point), and ideally friends-only.
+- **Data rights:** let users delete their account + data; collect the minimum needed.
+
+## 10. Visual direction (refs in ~/Desktop/materials)
+
+Elegant, tactile, fine-art realism — NOT childish pixel. Pixel only as a small accent.
+- **Avatar / clans:** voxel / blocky **3D cute figures** (`character1.webp`), colored per clan.
+- **Material:** **pearlescent / iridescent / glass** (`pearltexture.jpg`, modernist glass house `images.jpeg`) — the app's "liquid glass" = pearly + tactile, not flat glassmorphism.
+- **Tone:** Laila-Gohar-style **surreal-domestic still-life realism** (`gohar*`) — pastel, refined, warm whimsy.
+- **Energy / color:** Tomokazu-Matsuyama-style **vibrant maximalist pops** (`tomokazu.jpeg`) over a calm neutral base; curated palette (`miya.jpeg` swatch strip).
+- **Implications:** simple **modern** font at openings (not pixel); **one neutral base color + 3 construct accents**; tactile reaction on click; refined > cute.
+
 ## Open decisions
 - [ ] Map: **WebView-reuse** vs native rebuild (recommend WebView to start).
 - [ ] Collection: local-only now → Supabase when ready to gather narrations.

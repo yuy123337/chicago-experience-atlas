@@ -1,56 +1,80 @@
 # Chicago — Experience Atlas
 
-An interactive map of Chicago places, colored not by star rating but by the *kind of inner
-experience* a place tends to afford: **psychologically rich**, **happy**, or **meaningful**.
+*Hi! If you're my labmate reading this — welcome. This is a research prototype, not a product, so
+I've tried to write it the way I'd explain it to you over coffee: what it is, how the data works,
+how to keep it alive, and the things I'm still worried about.*
 
-> Pick an experience → the city opens → places glow by how strongly visitors' words suggest
-> that experience. Then go, and maybe you'll grow one of your own.
+An interactive map of Chicago places, colored **not by star rating** but by the *kind of inner
+experience* a place tends to afford: **psychologically rich**, **happy**, or **meaningful**
+(Oishi & Westgate, 2022, *Psychological Review* — please double-check the exact cite). We're not
+asking "is this place good?" — we're asking "what does being here tend to *feel* like, in
+people's own words?"
 
-## What this is (and isn't)
+---
 
-This is a **research prototype** from a psychology lab studying the *good life* across places.
-It is **not** a travel-rating site. I'm not asking "is this place good?" — I'm asking
-"what does being here tend to *feel* like, in people's own words?"
+## What is `data.js`? (read this first)
 
-The framing follows the idea that a good life has more than one dimension — not only **happiness**
-and **meaning**, but also **psychological richness**: novelty, variety, perspective-change, and
-interesting experience. *(See Oishi & Westgate, 2022, Psychological Review — verify exact citation.)*
+`data.js` is **not the raw data** — it's the small, baked file the website actually reads. It holds:
 
-## How I calculated the scores
+- `window.DATA` — for each construct (`rich`, `happy`, `meaning`, + 7 richness sub-dimensions), a list
+  of the **top recommended places**, each: `{name, cat, grp, lat, lon, score, rev, rating, url}`.
+- `window.ZIPXY` — a ZIP → coordinate lookup for the "Jump to ZIP" box.
 
-*(Conceptual overview. The exact scoring implementation is kept private pending an IP/patent
-decision — see note below.)*
+It's a **curated slice**, not everything. It's generated from our scoring output — see below.
 
-1. **Source.** I start from **public Google reviews** of Chicago places (a 2016–2021 snapshot).
-2. **Meaning-space.** I represent each review with a sentence-embedding model, so that two passages
-   that *mean* similar things sit near each other — beyond shared keywords.
-3. **Anchoring each construct.** I define each experience (rich / happy / meaningful) by anchor
-   phrases that capture it and its opposite.
-4. **Scoring a review → a place.** Each review leans toward or away from a construct by how close it
-   sits to that construct's anchors versus the opposite. I aggregate review-level signal up to the place.
-5. **What I surface as "worth recommending."** I rank places by this **relative affordance** score —
-   how distinctively a place leans toward an experience — *not* by star rating or popularity. A small,
-   quiet place that consistently sparks rich experiences can outrank a famous one.
+## How places get picked (the criteria — all in `build_chicago_site.py`)
 
-### Honest limits
-- **Descriptive, not causal.** A high score means visitors *described* the experience there — not a
-  guarantee you will have it.
-- **A snapshot.** 2016–2021 language; places change.
-- **Aggregate, not endorsement.** These are patterns in collective language, not the lab's stamp of approval.
+```
+MIN_REV = 30     # only places with ≥ 30 reviews (reliability)
+PCT     = 0.05   # keep the top 5% by each construct's score
+CAP     = 400    # at most 400 per construct
+```
+- **Richness** uses a *composite* of 6 sub-scores (`RICH_DIMS` = Psychological_Richness, FG_Richness,
+  Curiosity_Stretching, Surprise, Perspective_Change, Exploration_Behavior), not a single vector.
+- Current result ≈ **917 places** across rich/happy/meaning. Want more? Raise `CAP` / loosen `PCT` —
+  e.g. dropping the cap gives ~**2,958** (still ≥30 reviews). It's one line.
 
-## Data sources
-- Place scores: my offline analysis of public Google reviews (this snapshot).
-- Map tiles: CARTO / OpenStreetMap. Place links open Google Maps (attribution per Google's terms).
+## Keeping the data sustainable (the update loop)
 
-## IP / patent note
-The precise scoring algorithm is intentionally **not** included here. If you are reading this and the
-repository is public, treat the method description as conceptual only.
+The **source of truth** is *not* `data.js` — it's the scoring CSV on the shared Drive:
+`…/experience_city_project_2007_2021/website_dat/output/chicago_eligible_master.csv` (41,107 places).
+
+To refresh the map after re-scoring or to widen the selection:
+1. (optional) tweak `MIN_REV / PCT / CAP` in `build_chicago_site.py`.
+2. `python build_chicago_site.py`  → rewrites `data.js` (and a reference `index.generated.html`).
+3. Bump the `?v=` number on the `data.js` line in `index.html` so browsers reload.
+4. `git add -A && git commit -m "refresh data" && git push`.
+
+`index.html` is the **hand-maintained source of truth** for the site itself — the generator no longer
+overwrites it (it only writes data + a reference copy), so your design edits are safe.
+
+## How the scores are made (conceptual)
+
+Public Google reviews (2016–2021) → sentence-embeddings → each construct anchored by phrases and its
+opposite → a review leans toward/away from a construct by cosine to those anchors → aggregated to the
+place. We rank by **relative affordance** (how distinctively a place leans), *not* popularity.
+*(Exact implementation kept private pending an IP/patent decision — keep this repo private.)*
+
+## Things I'm still worried about (please poke at these)
+
+- **It's a 2021 snapshot.** Some places have closed and details are stale — so I deliberately show a
+  **vague** popularity band ("lots of visitors") instead of exact stars/counts. Live details should
+  come from the Google Places API later (in the app), not this file.
+- **Discriminant validity.** The constructs are *highly collinear* — richness correlates with happy
+  (0.81) and meaning (0.83) about as much as with its own sub-dimensions. See the sub-dimension cell in
+  `diagnose.ipynb`. We probably need to residualize on a general factor before trusting the split.
+- **Length confound.** Scores correlate negatively with review length; we control for word count.
+- **Descriptive, not causal**, and **aggregate, not endorsement.**
+- Nice validity signal: "vice" places (tobacco/cannabis/liquor) are ~**half** as common in the top-5%
+  rich (1.6% vs 3.1% base) — see the `is_vice` cell in `diagnose.ipynb`.
 
 ## Files
-- `index.html` — the whole front-end (hand-maintained source of truth).
-- `data.js` — the scored places + ZIP lookup the map reads.
-- `leaflet.js` / `leaflet.css` — the mapping library (vendored).
+- `index.html` — the whole front-end (source of truth).
+- `data.js` — the baked places + ZIP lookup the map reads.
+- `build_chicago_site.py` — the generator (CSV → `data.js`); selection criteria live here.
+- `places_by_zip.json` — 319-ZIP place sets for the three-good-lives survey site.
+- `diagnose.ipynb` *(on the Drive, not here)* — data-quality + validity checks (sub-dimensions, `is_vice`).
 - `APP_SKELETON.md` — design spec for the companion app (Good Life City Explorer).
 
 ---
-*Built by Yue Yin. A psychology-of-place project — exploring how the city shapes inner life.*
+*Oishi Lab · 2026 — Yue Yin. A psychology-of-place project, exploring how the city shapes inner life.*
