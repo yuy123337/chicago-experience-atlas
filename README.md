@@ -7,9 +7,9 @@ An interactive map of Chicago places, colored **not by star rating** but by the 
 experience* a place tends to afford — **psychologically rich**, **happy**, or **meaningful**
 (Oishi & Westgate, 2022, *Psychological Review* — please double-check the exact cite).
 
-We're not asking *"is this place good — happy or meaningful?"* We're offering a **mental shortcut for
+From the perspective of the map users, * We're offering a **mental shortcut for
 deciding where to go**: a way to evaluate a place by the experience it tends to open up in you — read
-from how visitors narrate it, in their own words.
+from how visitors narrate it, in their own words, and hopefully we can learn about a more general question: *"is this place provide happy, psychologically rich or meaningful experience?"
 
 ---
 
