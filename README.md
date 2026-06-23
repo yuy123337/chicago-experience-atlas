@@ -7,8 +7,10 @@ how to keep it alive, and the things I'm still worried about.*
 An interactive map of Chicago places, colored **not by star rating** but by the *kind of inner
 experience* a place tends to afford: **psychologically rich**, **happy**, or **meaningful**
 (Oishi & Westgate, 2022, *Psychological Review* — please double-check the exact cite). We're not
-asking "is this place good?" — we're asking "what does being here tend to *feel* like, in
-people's own words?"
+asking "is this place meaningful or happy ?" — we're giving place a mental short cut to take when deciding or evaluating a place, 
+
+asking "what does being here tend to *feel* like, in
+people's own words?" 
 
 ---
 
