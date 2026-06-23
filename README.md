@@ -1,7 +1,7 @@
 # Chicago — Experience Atlas
 
-*Hi! If you're my labmate reading this — welcome. This is a research prototype, not a product, so
-I've tried to write it the way I'd explain it to you over coffee: what it is, how the data works,
+*Hi! This is a research prototype, not a product, so
+This README tells: what it is, how the data works,
 how to keep it alive, and the things I'm still worried about.*
 
 An interactive map of Chicago places, colored **not by star rating** but by the *kind of inner
