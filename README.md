@@ -66,6 +66,7 @@ place. We rank by **relative affordance** (how distinctively a place leans), *no
   `diagnose.ipynb`. We probably need to residualize on a general factor before trusting the split.
 - **Length confound.** Scores correlate negatively with review length; we control for word count.
 - **Descriptive, not causal**, and **aggregate, not endorsement.**
+- **Religion (the one to watch):** religious places (churches, temples, places of worship) are **kept in** the dataset, *not* excluded. Because we show only the **top 5% per construct**, they rarely surface — *except* on **Meaningfulness**, where a church can genuinely rank high (a meaning ↔ religiosity confound). If one starts dominating the Meaningful map, add a category filter (`church|place of worship|temple|mosque|synagogue|…`) in `build_chicago_site.py`. (Vice places — tobacco/cannabis/liquor — are likewise kept but rare in top-rich; `is_vice` ≈ half the base rate.)
 - Nice validity signal: "vice" places (tobacco/cannabis/liquor) are ~**half** as common in the top-5%
   rich (1.6% vs 3.1% base) — see the `is_vice` cell in `diagnose.ipynb`.
 
@@ -76,6 +77,19 @@ place. We rank by **relative affordance** (how distinctively a place leans), *no
 - `places_by_zip.json` — 319-ZIP place sets for the three-good-lives survey site.
 - `diagnose.ipynb` *(on the Drive, not here)* — data-quality + validity checks (sub-dimensions, `is_vice`).
 - `APP_SKELETON.md` — design spec for the companion app (Good Life City Explorer).
+
+---
+## Exporting the collected data
+
+Contributions land in a **Google Sheet** (6 tabs: construct × relation) — full guide in **`DATA_PIPELINE.md`**. Quick paths:
+- **Manual (most reliable):** open a tab → **File → Download → CSV** (or **Excel `.xlsx`**) → `pd.read_csv("rich_been.csv")`.
+- **Live in a notebook:** **File → Share → Publish to web → pick the tab → CSV** → copy URL → `pd.read_csv(URL)` (re-run = latest data). *(Publish-to-web is publicly readable; use manual download or `gspread` for private.)*
+- **Before the Sheet is wired:** on the site, console (⌘⌥J) → `exportFeedback()` → downloads CSV (your browser only).
+
+Then **join to place metadata** on `place_id` = `gmap_id`:
+```python
+feedback.merge(master, left_on="place_id", right_on="gmap_id", how="left")
+```
 
 ---
 *Oishi Lab · 2026 — Yue Yin. A psychology-of-place project, exploring how the city shapes inner life.*
