@@ -59,7 +59,6 @@
 #bar.show{display:flex}#bar .lbl{font-family:'Montserrat',sans-serif;font-weight:700;font-size:16px;color:#eef2f7;margin-right:2px}
 .barrow{display:flex;gap:10px;align-items:center;justify-content:center}
 #viewtoggle{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;padding:7px 11px;border-radius:10px;border:1px solid rgba(190,200,215,.4);background:rgba(12,14,20,.7);color:#eef2f7;cursor:pointer}
-#expbtn{font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:7px 11px;border-radius:10px;border:0;background:#2f9f5a;color:#fff;cursor:pointer}
 #listview{position:absolute;top:112px;left:16px;right:16px;bottom:16px;z-index:799;background:#fff;border-radius:16px;overflow-y:auto;box-shadow:0 14px 44px rgba(0,0,0,.32);display:none;font-family:'Nunito',sans-serif}
 #listview.show{display:block}
 .lvhead{position:sticky;top:0;background:#fff;padding:15px 18px 11px;border-bottom:2px solid #eef0f3;font-family:'Fredoka';font-weight:600;font-size:16px;color:#1b1b24}
@@ -157,7 +156,7 @@ select{font-family:'Montserrat',sans-serif;font-size:13px;padding:7px 10px;borde
  <select id="selConstruct" title="Change construct"><option value="rich">Psychologically Rich</option><option value="happy">Happy</option><option value="meaning">Meaningful</option></select>
  <span class="lbl" style="font-size:13px;opacity:.85;margin:0 0 0 6px">Place type</span><select id="selCat"><option value="All">All places</option><option>Culture</option><option>Food</option>
   <option>Nature</option><option>Active</option><option>Retail</option><option>Civic</option><option>Wellness</option></select><button id="viewtoggle" onclick="toggleView()">▤ List view</button></div>
- <div class="barrow"><span class="lbl" style="font-size:12px;margin:0;opacity:.85">Jump to ZIP</span><input id="zipin" placeholder="e.g. 60614" maxlength="5"><button id="zipgo">Go</button><button id="expbtn" onclick="exportFeedback()" title="Download collected contributions as CSV (test)">⬇ Export</button></div></div>
+ <div class="barrow"><span class="lbl" style="font-size:12px;margin:0;opacity:.85">Jump to ZIP</span><input id="zipin" placeholder="e.g. 60614" maxlength="5"><button id="zipgo">Go</button></div></div>
 <div id="legend"></div>
 <button id="back" onclick="goBack()" title="Back to experiences">&#8249;</button>
 <div id="disc" class="show">Scores aggregate public Google reviews (2016&ndash;2021): a place's tendency to <i>afford</i>
@@ -319,14 +318,6 @@ function saveExplorerEmail(){var em=(document.getElementById("emEmail").value||"
   var a=JSON.parse(localStorage.getItem("lic_feedback")||"[]");if(a.length){a[a.length-1].email=em;localStorage.setItem("lic_feedback",JSON.stringify(a));}
   if(FEEDBACK_URL)fetch(FEEDBACK_URL,{method:"POST",mode:"no-cors",body:JSON.stringify({relation:"signup",email:em,ts:new Date().toISOString()})});}
  closeEmailModal();}
-window.exportFeedback=function(){var a=JSON.parse(localStorage.getItem("lic_feedback")||"[]");
- if(!a.length){alert("No feedback collected yet.");return;}
- var esc=function(s){return '"'+(""+(s==null?"":s)).replace(/"/g,'""')+'"';};
- function dl(rows,cols,name){if(!rows.length)return;
-  var csv=[cols.join(",")].concat(rows.map(function(r){return cols.map(function(c){return esc(r[c]);}).join(",");})).join("\n");
-  var d=document.createElement("a");d.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));d.download=name;d.click();}
- dl(a.filter(function(r){return r.relation==="been";}),["ts","place_id","construct","name","cat","grp","lat","lon","rich_1to5","meaning_1to5","happy_1to5","frequency","endorse","emotions","text","email"],"chicago_been_here.csv");
- dl(a.filter(function(r){return r.relation!=="been";}),["ts","relation","place_id","construct","name","cat","grp","lat","lon","expectation","email"],"chicago_curious.csv");};
 document.getElementById("walkers").addEventListener("click",function(e){var w=e.target.closest(".walker");
  if(w){w.style.setProperty("--jh",(-(22+Math.floor(Math.random()*40)))+"px");
   w.classList.add("jump");setTimeout(function(){w.classList.remove("jump");},560);}});
