@@ -338,6 +338,7 @@ document.getElementById("selConstruct").onchange=function(){cur=this.value;apply
 document.getElementById("selCat").onchange=function(){render();if(listMode)renderList();};
 var listMode=false;
 function toggleView(){listMode=!listMode;document.getElementById("listview").classList.toggle("show",listMode);
+ document.getElementById("disc").classList.toggle("show",!listMode);  // disclaimer only makes sense over the map
  document.getElementById("viewtoggle").textContent=listMode?"🗺 Map":"▤ List view";if(listMode)renderList();}
 function renderList(){var cat=document.getElementById("selCat").value;
  var arr=window.DATA[cur].filter(function(p){return cat==="All"||p.grp===cat;}).slice();
