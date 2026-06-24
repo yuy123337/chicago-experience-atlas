@@ -103,4 +103,4 @@ feedback.merge(master, left_on="place_id", right_on="gmap_id", how="left")
 **Auto-expiry:** the prompt is gated by `EVENT_START`/`EVENT_END` near the top of the script in `index.html` (currently `2026-06-24`→`2026-06-26` — **event date is 6.25**). After `EVENT_END` the prompt **never shows again** and the site behaves exactly as it did before — **no redeploy needed**. The date window controls only the *prompt*: data already collected (passport IDs included) **stays in the Sheet permanently**. To end early, set `EVENT_END` to a past date and push.
 
 ---
-*Oishi Lab · 2026 — Yue Yin. A psychology-of-place project, exploring how the city shapes inner life.*
+*Oishi Lab · 2026 — Yin*
