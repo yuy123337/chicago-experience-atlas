@@ -90,10 +90,10 @@ select{font-family:'Montserrat',sans-serif;font-size:13px;padding:7px 10px;borde
  font-family:'Fredoka','Montserrat',sans-serif;font-weight:600;font-size:22px;color:#fff;
  background:rgba(20,22,30,.85);padding:18px 28px;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.5);pointer-events:none}
 #soon.show{display:block}#soon small{font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;opacity:.85}
-#thanks{position:fixed;top:90px;left:50%;transform:translateX(-50%) translateY(-8px) scale(.8);z-index:1500;text-align:center;display:none;opacity:0;
- font-family:'Fredoka','Montserrat',sans-serif;font-weight:700;font-size:27px;color:#1f7d44;pointer-events:none;
- text-shadow:0 2px 12px rgba(255,255,255,.95),0 1px 3px rgba(255,255,255,.95);transition:opacity .3s ease,transform .42s cubic-bezier(.2,2,.3,1)}
-#thanks.show{display:block;opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+#thanks{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.5);z-index:1500;text-align:center;display:none;opacity:0;
+ font-family:'Fredoka','Montserrat',sans-serif;font-weight:700;font-size:32px;color:#1f7d44;pointer-events:none;
+ text-shadow:0 2px 12px rgba(255,255,255,.95),0 1px 3px rgba(255,255,255,.95);transition:opacity .12s ease,transform .26s cubic-bezier(.2,2.2,.3,1)}
+#thanks.show{display:block;opacity:1;transform:translate(-50%,-50%) scale(1)}
 #thanks small{display:block;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;color:#3a6b4e;margin-top:4px;text-shadow:0 1px 8px rgba(255,255,255,.95)}
 .footstamp{font-size:22px;line-height:28px;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
 #droste{position:fixed;inset:0;z-index:1450;pointer-events:none;display:none}#droste.go{display:block}
@@ -301,7 +301,7 @@ function goBack(){document.getElementById("gate").classList.remove("hide");
  document.getElementById("quote").classList.remove("show");}
 // === Contribute panel ===
 // EMOTIONS = a swappable config. Revise this list, or replace with a soulful scale later — nothing else changes.
-var FEEDBACK_URL="https://script.google.com/macros/s/AKfycbxT37jql6-Tu_IhrCb6e9IY1V4vJ7fs5S7A9o6QxR8MyXSXvOprwObQ4Q_nh6SPd6PMDw/exec";  // Apps Script web app — appends each contribution to the Google Sheet
+var FEEDBACK_URL="https://script.google.com/macros/s/AKfycbxWA3unCbDGXiBrVKxHK9FtWV-RA3CV6hWJhOy5NHptvyJQwgE1prBFbzq1OI9PldUC/exec";  // Apps Script web app — appends each contribution to the Google Sheet
 // ---- Mindworks Passport — TEMPORARY event feature. Auto-expires: after EVENT_END the prompt NEVER shows (site reverts to normal). Data already collected stays in the Sheet forever. ----
 var EVENT_START="2026-06-24T00:00:00",EVENT_END="2026-06-26T12:00:00";  // ← ACTIVE NOW (Jun 24) → noon Jun 26 (visitor's LOCAL time). Event itself is Jun 25 5–8pm. After EVENT_END the prompt stops; site reverts to normal.
 function inEventWindow(){var now=new Date();return now>=new Date(EVENT_START)&&now<=new Date(EVENT_END);}
@@ -366,7 +366,13 @@ function submitPanel(){var p=PANEL_PLACE;if(!p)return;
  var a=JSON.parse(localStorage.getItem("lic_feedback")||"[]");a.push(rec);localStorage.setItem("lic_feedback",JSON.stringify(a));
  if(FEEDBACK_URL)fetch(FEEDBACK_URL,{method:"POST",mode:"no-cors",body:JSON.stringify(rec)});  // send to Google Sheet
  stampPlace(p.lat,p.lon);  // stamp their personal map with a footprint (this session)
- document.getElementById("pMsg").textContent="";closePanel();showThanks();}
+ document.getElementById("pMsg").textContent="";closePanel();showThanks();maybeAskEmail();}
+// Ask for an email ONCE per session, only after a contribution, and never if they already opted in.
+function maybeAskEmail(){
+ if(localStorage.getItem("lic_email"))return;             // already signed up — don't nag
+ if(sessionStorage.getItem("lic_email_asked"))return;     // only the first contribution this session triggers it
+ sessionStorage.setItem("lic_email_asked","1");
+ setTimeout(function(){document.getElementById("emailModal").classList.add("show");},1700);}  // let the thanks toast land first
 function closeEmailModal(){document.getElementById("emailModal").classList.remove("show");}
 function saveExplorerEmail(){var em=(document.getElementById("emEmail").value||"").trim();
  if(em){localStorage.setItem("lic_email",em);
