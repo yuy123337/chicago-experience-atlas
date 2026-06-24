@@ -102,7 +102,7 @@ feedback.merge(master, left_on="place_id", right_on="gmap_id", how="left")
 
 **Persistence is session-based** (`sessionStorage`): the ID is held while the tab stays open and **cleared when the tab closes** — the prompt warns them they'll re-enter it on return. (Chosen over device storage so a borrowed/returned phone never carries a stale ID.)
 
-**Auto-expiry:** the prompt is gated by `EVENT_START`/`EVENT_END` near the top of the script in `index.html` (currently `2026-06-24`→`2026-06-26` — **set these to the real event days**). After `EVENT_END` the prompt **never shows again** and the site behaves exactly as it did before — **no redeploy needed**. The date window controls only the *prompt*: data already collected (passport IDs included) **stays in the Sheet permanently**. To end early, set `EVENT_END` to a past date and push.
+**Auto-expiry:** the prompt is gated by `EVENT_START`/`EVENT_END` near the top of the script in `index.html` (currently `2026-06-24`→`2026-06-26` — **event date is 6.25**). After `EVENT_END` the prompt **never shows again** and the site behaves exactly as it did before — **no redeploy needed**. The date window controls only the *prompt*: data already collected (passport IDs included) **stays in the Sheet permanently**. To end early, set `EVENT_END` to a past date and push.
 
 ---
 *Oishi Lab · 2026 — Yue Yin. A psychology-of-place project, exploring how the city shapes inner life.*
