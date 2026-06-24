@@ -79,7 +79,14 @@ place. We rank by **relative affordance** (how distinctively a place leans), *no
 ---
 ## Exporting the collected data
 
-Contributions land in the **`Chicago_feedbacks` Google Sheet** — **3 tabs**: `been` (visited places: all 3 ratings + emotions + free text), `curious` (intentions + expectation), and `explorers` (opt-in emails). Emotions are **dummy-coded** (one `0/1` column per option, plus an `emotions_raw` string). Full guide in **`DATA_PIPELINE.md`**. Quick paths:
+Contributions land in the **`Chicago_feedbacks` Google Sheet** — **3 tabs**:
+- **`been`** (visited places): *experienced* 1–5 ratings (`rich_1to5`, `meaning_1to5`, `happy_1to5`), emotions, `frequency`, `endorse`, free `text`.
+- **`curious`** (places they're curious about): ***expected*** 1–5 ratings (`exp_rich_1to5`, `exp_meaning_1to5`, `exp_happy_1to5`) + a free-text `expectation`. (Same slider UI as `been`, future-tensed — lets us study expectation vs. experience.)
+- **`explorers`** (opt-in): `email` + `home_zip` (the ZIP they live in), de-duplicated by email.
+
+Every row also carries `ts` (UTC), `ts_local` (Chicago time), and `passport_id`.
+
+**Emotions are dummy-coded** — one `0/1` column per word (`emo_*`) plus an `emotions_raw` string. **Nine words**: six positive (pleasant/enjoyable→happy, interesting/surprising→rich, fulfilling/purposeful→meaning) and three reverse-keyed negatives (**stressful**↔happy, **boring**↔rich, **shallow**↔meaning) to flag places the algorithm over-ranked. Full guide in **`DATA_PIPELINE.md`**. Quick paths:
 - **Manual (most reliable):** open a tab → **File → Download → CSV** (or **Excel `.xlsx`**) → `pd.read_csv("been.csv")`.
 - **Live in a notebook:** **File → Share → Publish to web → pick the tab → CSV** → copy URL → `pd.read_csv(URL)` (re-run = latest data). *(Publish-to-web is publicly readable; use manual download or `gspread` for private.)*
 
@@ -87,6 +94,10 @@ Then **join to place metadata** on `place_id` = `gmap_id`:
 ```python
 feedback.merge(master, left_on="place_id", right_on="gmap_id", how="left")
 ```
+
+> **The schema self-heals.** The Apps Script (`apps_script.gs`) adds new columns automatically when we add questions — you **never clear or rebuild the Sheet**. One caveat: on a tab that already has rows, a new field appears as a **new column at the far right** (existing rows stay aligned, nothing shifts). So don't assume a fixed column order — **select by column name** in pandas.
+>
+> **Concurrency & no data loss.** Writes are serialized by a script lock (simultaneous submissions queue, never collide). Beyond that, delivery is **durable + acknowledged**: every submission carries a unique `cid` (**idempotency key**) and sits in a `localStorage` **outbox**. It's sent in CORS mode so the client can *read* the `{ok:true}` acknowledgement; any unconfirmed send is **retried** (jittered + exponential backoff, and again on the next page load). The server **dedups on `cid`**, so a retry can never create a duplicate row. Net effect: each submission is delivered **exactly once** — surviving wifi drops, closed tabs, and bursts. *(For web-scale traffic you'd move to Firestore/Supabase; this is the production *pattern* on the lightweight stack.)*
 
 ---
 ## Mindworks event mode — TEMPORARY (passport ID)

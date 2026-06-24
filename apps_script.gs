@@ -24,7 +24,8 @@
 // ============================================================
 
 // Canonical emotion options, in fixed column order. Must match EMOS keys in index.html.
-var EMO_KEYS = ['pleasant', 'enjoyable', 'interesting', 'surprising', 'fulfilling', 'purposeful'];
+// 6 positive (2/construct) + 3 reverse-keyed negatives: stressful↔happy, boring↔rich, shallow↔meaning.
+var EMO_KEYS = ['pleasant', 'enjoyable', 'interesting', 'surprising', 'fulfilling', 'purposeful', 'stressful', 'boring', 'shallow'];
 
 // Add profanity / slurs here (lowercase). Rows that match are FLAGGED, not deleted
 // (we preserve research data; the lab decides, and public views can hide flagged rows).
@@ -38,10 +39,35 @@ function flagText(t) {
   return '';
 }
 
-// "pleasant|interesting" -> [1,0,1,0,0,0] in EMO_KEYS order
-function emoBinaries(raw) {
+// "pleasant|interesting" -> {emo_pleasant:1, emo_interesting:1, ...} (0 for the rest), in EMO_KEYS order
+function emoDict(raw) {
   var picked = (raw || '').toLowerCase().split('|');  // split the pipe-string the site sends
-  return EMO_KEYS.map(function (k) { return picked.indexOf(k) >= 0 ? 1 : 0; });
+  var o = {}; EMO_KEYS.forEach(function (k) { o['emo_' + k] = picked.indexOf(k) >= 0 ? 1 : 0; }); return o;
+}
+
+// Append a row from a {field:value} object, SELF-HEALING the header so schema changes never need a tab wipe:
+//   • empty tab        → write the canonical header, then the row
+//   • missing a column → add that field as a NEW trailing column (no shifting; existing rows stay aligned)
+//   • always           → write values in the CURRENT header's order
+// This is why adding emotions / ratings / zip no longer requires clearing the Sheet.
+function appendObj(sh, obj, order) {
+  if (sh.getLastRow() === 0) sh.appendRow(order);
+  var header = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
+  Object.keys(obj).forEach(function (k) {
+    if (header.indexOf(k) < 0) { header.push(k); sh.getRange(1, header.length, 1, 1).setValue(k); }
+  });
+  sh.appendRow(header.map(function (col) { return obj.hasOwnProperty(col) ? obj[col] : ''; }));
+}
+
+// Idempotency: has this cid already been written to this tab? (so a client retry never duplicates a row)
+function cidExists(sh, cid) {
+  if (sh.getLastRow() < 2) return false;
+  var header = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
+  var ci = header.indexOf('cid');
+  if (ci < 0) return false;
+  var col = sh.getRange(2, ci + 1, sh.getLastRow() - 1, 1).getValues();
+  for (var i = 0; i < col.length; i++) { if (col[i][0] === cid) return true; }
+  return false;
 }
 
 function doPost(e) {
@@ -60,17 +86,26 @@ function doPost(e) {
     var reason  = flagText(d.text || d.expectation || '');
     var flagged = reason ? 1 : 0;
     var emoCols = EMO_KEYS.map(function (k) { return 'emo_' + k; });  // header names
-    var emoVals = emoBinaries(d.emotions);                            // 0/1 values
 
-    if (sh.getLastRow() === 0) {
-      sh.appendRow(been
-        ? ['ts','place_id','passport_id','construct','name','cat','grp','lat','lon','rich_1to5','meaning_1to5','happy_1to5','frequency','endorse'].concat(emoCols).concat(['emotions_raw','text','email','flagged','flag_reason'])
-        : ['ts','place_id','passport_id','construct','name','cat','grp','lat','lon','expectation'].concat(emoCols).concat(['emotions_raw','email','flagged','flag_reason']));
+    if (d.cid && cidExists(sh, d.cid)) return out({ ok: true, dup: true });  // idempotent: a client retry — ack, don't re-write
+
+    // Build the row as a field→value object so appendObj can self-heal the header.
+    var obj = { ts:d.ts, ts_local:d.ts_local||'', cid:d.cid||'', place_id:d.place_id, passport_id:d.passport_id||'', construct:d.construct,
+                name:d.name, cat:d.cat, grp:d.grp, lat:d.lat, lon:d.lon };
+    var ed = emoDict(d.emotions); for (var k in ed) obj[k] = ed[k];     // emo_* dummies (incl. stressful/boring/shallow)
+    obj.emotions_raw = d.emotions || ''; obj.email = d.email || ''; obj.flagged = flagged; obj.flag_reason = reason;
+
+    var order;
+    if (been) {
+      obj.rich_1to5 = d.rich_1to5; obj.meaning_1to5 = d.meaning_1to5; obj.happy_1to5 = d.happy_1to5;
+      obj.frequency = d.frequency; obj.endorse = d.endorse; obj.text = d.text;
+      order = ['ts','ts_local','cid','place_id','passport_id','construct','name','cat','grp','lat','lon','rich_1to5','meaning_1to5','happy_1to5','frequency','endorse'].concat(emoCols).concat(['emotions_raw','text','email','flagged','flag_reason']);
+    } else {
+      obj.expectation = d.expectation;
+      obj.exp_rich_1to5 = d.rich_1to5; obj.exp_meaning_1to5 = d.meaning_1to5; obj.exp_happy_1to5 = d.happy_1to5;  // curious sliders = EXPECTED ratings
+      order = ['ts','ts_local','cid','place_id','passport_id','construct','name','cat','grp','lat','lon','expectation','exp_rich_1to5','exp_meaning_1to5','exp_happy_1to5'].concat(emoCols).concat(['emotions_raw','email','flagged','flag_reason']);
     }
-
-    sh.appendRow(been
-      ? [d.ts,d.place_id,d.passport_id||'',d.construct,d.name,d.cat,d.grp,d.lat,d.lon,d.rich_1to5,d.meaning_1to5,d.happy_1to5,d.frequency,d.endorse].concat(emoVals).concat([d.emotions||'',d.text,d.email,flagged,reason])
-      : [d.ts,d.place_id,d.passport_id||'',d.construct,d.name,d.cat,d.grp,d.lat,d.lon,d.expectation].concat(emoVals).concat([d.emotions||'',d.email,flagged,reason]));
+    appendObj(sh, obj, order);
 
     if (d.email) logSignup(ss, d);   // also collect the email as a "become an Explorer" sign-up
     return out({ ok: true });
@@ -84,11 +119,12 @@ function doPost(e) {
 // Clean, de-duplicated email list of people who opted in ("become a City Explorer").
 function logSignup(ss, d) {
   var sh = ss.getSheetByName('explorers') || ss.insertSheet('explorers');
-  if (sh.getLastRow() === 0) sh.appendRow(['ts', 'email', 'passport_id', 'first_construct']);
-  var existing = sh.getLastRow() > 1
-    ? sh.getRange(2, 2, sh.getLastRow() - 1, 1).getValues().map(function (r) { return r[0]; })
-    : [];
-  if (existing.indexOf(d.email) < 0) sh.appendRow([d.ts, d.email, d.passport_id || '', d.construct]);  // skip duplicates
+  if (sh.getLastRow() > 1) {  // dedup on email (column 2)
+    var emails = sh.getRange(2, 2, sh.getLastRow() - 1, 1).getValues().map(function (r) { return r[0]; });
+    if (emails.indexOf(d.email) >= 0) return;  // already signed up — skip
+  }
+  appendObj(sh, { ts:d.ts, ts_local:d.ts_local||'', email:d.email, home_zip:d.home_zip||'', passport_id:d.passport_id||'', first_construct:d.construct, cid:d.cid||'' },
+            ['ts', 'ts_local', 'email', 'home_zip', 'passport_id', 'first_construct', 'cid']);
 }
 
 function out(o) {
