@@ -84,11 +84,11 @@ function doPost(e) {
 // Clean, de-duplicated email list of people who opted in ("become a City Explorer").
 function logSignup(ss, d) {
   var sh = ss.getSheetByName('explorers') || ss.insertSheet('explorers');
-  if (sh.getLastRow() === 0) sh.appendRow(['ts', 'email', 'first_construct']);
+  if (sh.getLastRow() === 0) sh.appendRow(['ts', 'email', 'passport_id', 'first_construct']);
   var existing = sh.getLastRow() > 1
     ? sh.getRange(2, 2, sh.getLastRow() - 1, 1).getValues().map(function (r) { return r[0]; })
     : [];
-  if (existing.indexOf(d.email) < 0) sh.appendRow([d.ts, d.email, d.construct]);  // skip duplicates
+  if (existing.indexOf(d.email) < 0) sh.appendRow([d.ts, d.email, d.passport_id || '', d.construct]);  // skip duplicates
 }
 
 function out(o) {
