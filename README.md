@@ -81,15 +81,28 @@ place. We rank by **relative affordance** (how distinctively a place leans), *no
 ---
 ## Exporting the collected data
 
-Contributions land in a **Google Sheet** (6 tabs: construct × relation) — full guide in **`DATA_PIPELINE.md`**. Quick paths:
-- **Manual (most reliable):** open a tab → **File → Download → CSV** (or **Excel `.xlsx`**) → `pd.read_csv("rich_been.csv")`.
+Contributions land in the **`Chicago_feedbacks` Google Sheet** — **3 tabs**: `been` (visited places: all 3 ratings + emotions + free text), `curious` (intentions + expectation), and `explorers` (opt-in emails). Emotions are **dummy-coded** (one `0/1` column per option, plus an `emotions_raw` string). Full guide in **`DATA_PIPELINE.md`**. Quick paths:
+- **Manual (most reliable):** open a tab → **File → Download → CSV** (or **Excel `.xlsx`**) → `pd.read_csv("been.csv")`.
 - **Live in a notebook:** **File → Share → Publish to web → pick the tab → CSV** → copy URL → `pd.read_csv(URL)` (re-run = latest data). *(Publish-to-web is publicly readable; use manual download or `gspread` for private.)*
-- **Before the Sheet is wired:** on the site, console (⌘⌥J) → `exportFeedback()` → downloads CSV (your browser only).
 
 Then **join to place metadata** on `place_id` = `gmap_id`:
 ```python
 feedback.merge(master, left_on="place_id", right_on="gmap_id", how="left")
 ```
+
+---
+## Mindworks event mode — TEMPORARY (passport ID)
+
+**This feature exists only for the in-person Mindworks event, and is built to expire by itself.**
+
+**How it works live (during the event):**
+1. A visitor opens the site → a **maroon Mindworks Passport prompt** appears *before* anything else.
+2. They enter their **Mindworks Research Passport ID** — **required, no skip** (if they don't have one, an organizer creates one for them).
+3. They explore and contribute normally — and **every** submission carries their `passport_id` (a column in `been`, `curious`, and `explorers`). That's how their map contributions join to the rest of their event responses.
+
+**Persistence is session-based** (`sessionStorage`): the ID is held while the tab stays open and **cleared when the tab closes** — the prompt warns them they'll re-enter it on return. (Chosen over device storage so a borrowed/returned phone never carries a stale ID.)
+
+**Auto-expiry:** the prompt is gated by `EVENT_START`/`EVENT_END` near the top of the script in `index.html` (currently `2026-06-24`→`2026-06-26` — **set these to the real event days**). After `EVENT_END` the prompt **never shows again** and the site behaves exactly as it did before — **no redeploy needed**. The date window controls only the *prompt*: data already collected (passport IDs included) **stays in the Sheet permanently**. To end early, set `EVENT_END` to a past date and push.
 
 ---
 *Oishi Lab · 2026 — Yue Yin. A psychology-of-place project, exploring how the city shapes inner life.*

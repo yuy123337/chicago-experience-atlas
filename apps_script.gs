@@ -45,6 +45,8 @@ function emoBinaries(raw) {
 }
 
 function doPost(e) {
+  var lock = LockService.getScriptLock();   // serialize concurrent writes so simultaneous submissions never collide
+  try { lock.waitLock(20000); } catch (e2) { return out({ ok: false, error: 'busy' }); }
   try {
     var d = JSON.parse(e.postData.contents);
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -62,18 +64,20 @@ function doPost(e) {
 
     if (sh.getLastRow() === 0) {
       sh.appendRow(been
-        ? ['ts','place_id','construct','name','cat','grp','lat','lon','rich_1to5','meaning_1to5','happy_1to5','frequency','endorse'].concat(emoCols).concat(['emotions_raw','text','email','flagged','flag_reason'])
-        : ['ts','place_id','construct','name','cat','grp','lat','lon','expectation'].concat(emoCols).concat(['emotions_raw','email','flagged','flag_reason']));
+        ? ['ts','place_id','passport_id','construct','name','cat','grp','lat','lon','rich_1to5','meaning_1to5','happy_1to5','frequency','endorse'].concat(emoCols).concat(['emotions_raw','text','email','flagged','flag_reason'])
+        : ['ts','place_id','passport_id','construct','name','cat','grp','lat','lon','expectation'].concat(emoCols).concat(['emotions_raw','email','flagged','flag_reason']));
     }
 
     sh.appendRow(been
-      ? [d.ts,d.place_id,d.construct,d.name,d.cat,d.grp,d.lat,d.lon,d.rich_1to5,d.meaning_1to5,d.happy_1to5,d.frequency,d.endorse].concat(emoVals).concat([d.emotions||'',d.text,d.email,flagged,reason])
-      : [d.ts,d.place_id,d.construct,d.name,d.cat,d.grp,d.lat,d.lon,d.expectation].concat(emoVals).concat([d.emotions||'',d.email,flagged,reason]));
+      ? [d.ts,d.place_id,d.passport_id||'',d.construct,d.name,d.cat,d.grp,d.lat,d.lon,d.rich_1to5,d.meaning_1to5,d.happy_1to5,d.frequency,d.endorse].concat(emoVals).concat([d.emotions||'',d.text,d.email,flagged,reason])
+      : [d.ts,d.place_id,d.passport_id||'',d.construct,d.name,d.cat,d.grp,d.lat,d.lon,d.expectation].concat(emoVals).concat([d.emotions||'',d.email,flagged,reason]));
 
     if (d.email) logSignup(ss, d);   // also collect the email as a "become an Explorer" sign-up
     return out({ ok: true });
   } catch (err) {
     return out({ ok: false, error: String(err) });
+  } finally {
+    lock.releaseLock();
   }
 }
 
