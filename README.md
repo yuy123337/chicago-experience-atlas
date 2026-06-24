@@ -5,7 +5,7 @@ to a labmate: what it is, how the data works, how to keep it alive, and what I'm
 
 An interactive map of Chicago places, colored **not by star rating** but by the *kind of inner
 experience* a place tends to afford — **psychologically rich**, **happy**, or **meaningful**
-(Oishi & Westgate, 2022, *Psychological Review* — please double-check the exact cite).
+(Oishi & Westgate, 2022).
 
 From the perspective of the map users, * We're offering a **mental shortcut for
 deciding where to go**: a way to evaluate a place by the experience it tends to open up in you — read
