@@ -54,7 +54,6 @@ overwrites it (it only writes data + a reference copy), so your design edits are
 Public Google reviews (2016–2021) → sentence-embeddings → each construct anchored by phrases and its
 opposite → a review leans toward/away from a construct by cosine to those anchors → aggregated to the
 place. We rank by **relative affordance** (how distinctively a place leans), *not* popularity.
-*(Exact implementation kept private pending an IP/patent decision — keep this repo private.)*
 
 ## Things to be improved (please poke at these)
 
