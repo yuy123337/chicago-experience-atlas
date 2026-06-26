@@ -1,7 +1,7 @@
 # Chicago — Experience Atlas
 
 *Hi! This is a research prototype, not a product — so this README is written the way I'd explain it
-to a labmate: what it is, how the data works, how to keep it alive, and what I'm still worried about.*
+to my collaborator(s): what it is, how the data works, how to keep it alive, and what I'm still worried about.*
 
 An interactive map of Chicago places, colored **not by star rating** but by the *kind of inner
 experience* a place tends to afford — **psychologically rich**, **happy**, or **meaningful**
