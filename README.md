@@ -54,18 +54,13 @@ overwrites it (it only writes data + a reference copy), so your design edits are
 Public Google reviews (2016–2021) → sentence-embeddings → each construct anchored by phrases and its
 opposite → a review leans toward/away from a construct by cosine to those anchors → aggregated to the
 place. We rank by **relative affordance** (how distinctively a place leans), *not* popularity.
+## Approach
 
-## Things to be improved (please poke at these)
-
-- **It's a 2021 snapshot.** Some places have closed and details are stale — so I deliberately show a
-  **vague** popularity band ("lots of visitors") instead of exact stars/counts. Live details should
-  come from the Google Places API later (in the app), not this file.
-- **Discriminant validity.** The original way (cosine similarity direction) of calculating scores for reviews for different constructs are *highly collinear* — richness correlates with happy (0.81) and meaning (0.83) about as much as with its own sub-dimensions. See the sub-dimension cell in
-  `diagnose.ipynb`. We probably need to residualize on a general factor before trusting the split.
-- **Length confound.** Scores correlate negatively with review length; we control for word count.
-- **Religion (the one to watch):** religious places (churches, temples, places of worship) are **kept in** the dataset, *not* excluded. Because we show only the **top 5% per construct**, they rarely surface — *except* on **Meaningfulness**, where a church can genuinely rank high (a meaning ↔ religiosity confound). If one starts dominating the Meaningful map, add a category filter (`church|place of worship|temple|mosque|synagogue|…`) in `build_chicago_site.py`. (Vice places — tobacco/cannabis/liquor — are likewise kept but rare in top-rich; `is_vice` ≈ half the base rate.)
-- Nice validity signal: "vice" places (tobacco/cannabis/liquor) are ~**half** as common in the top-5%
-  rich (1.6% vs 3.1% base) — see the `is_vice` cell in `diagnose.ipynb`.
+- **A 2021 snapshot, shown as popularity bands.** The reviews run up to 2021, and some places have changed or closed since. So the map shows a broad popularity band ("lots of visitors") rather than exact star ratings or review counts. Live details (hours, ratings, whether a place is still open) will come from the Google Places API in the app, not from this file.
+- **Separating the three experiences.** Each review is scored on happiness, meaning and psychological richness by its cosine similarity to each construct's anchors. These first scores overlap strongly: richness correlates .81 with happiness and .83 with meaning, about as much as with its own sub-dimensions (see the sub-dimension cell in `diagnose.ipynb`). The next step is to remove the shared general factor before comparing the three.
+- **Controlling for review length.** Longer reviews tend to score lower, so the scores control for word count.
+- **Keeping every kind of place.** Religious places (churches, temples and other places of worship) stay in the data. Each map shows only the top 5% of places for its construct, so they rarely appear, except on the Meaningfulness map, where meaning and religion overlap and a church can genuinely rank high. If religious places start to dominate that map, a category filter in `build_chicago_site.py` (`church|place of worship|temple|mosque|synagogue|…`) can take them out. Tobacco, cannabis and liquor stores ("vice" places) are kept too.
+- **A validity check.** Vice places are about half as common among the top 5% richest places as in the data overall (1.6% vs 3.1%; see the `is_vice` cell in `diagnose.ipynb`), which fits what psychological richness should capture.
 
 ## Files
 - `index.html` — the whole front-end (source of truth).
