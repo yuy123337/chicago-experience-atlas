@@ -32,28 +32,14 @@ CAP     = 400    # at most 400 per construct
 ```
 - **Richness** uses a *composite* of 6 sub-scores (`RICH_DIMS` = Psychological_Richness, FG_Richness,
   Curiosity_Stretching, Surprise, Perspective_Change, Exploration_Behavior), not a single vector.
-- Current result ≈ **917 places** across rich/happy/meaning. Want more? Raise `CAP` / loosen `PCT` —
-  e.g. dropping the cap gives ~**2,958** (still ≥30 reviews). It's one line.
+- Current result ≈ **917 places** across rich/happy/meaning
 
-## Keeping the data sustainable (the update loop)
-
-The **source of truth** is *not* `data.js` — it's the scoring CSV on the shared Drive:
-`…/experience_city_project_2007_2021/website_dat/output/chicago_eligible_master.csv` (41,107 places).
-
-To refresh the map after re-scoring or to widen the selection:
-1. (optional) tweak `MIN_REV / PCT / CAP` in `build_chicago_site.py`.
-2. `python build_chicago_site.py`  → rewrites `data.js` (and a reference `index.generated.html`).
-3. Bump the `?v=` number on the `data.js` line in `index.html` so browsers reload.
-4. `git add -A && git commit -m "refresh data" && git push`.
-
-`index.html` is the **hand-maintained source of truth** for the site itself — the generator no longer
-overwrites it (it only writes data + a reference copy), so your design edits are safe.
 
 ## How the scores are made (conceptual)
 
 Public Google reviews (2016–2021) → sentence-embeddings → each construct anchored by phrases and its
 opposite → a review leans toward/away from a construct by cosine to those anchors → aggregated to the
-place. We rank by **relative affordance** (how distinctively a place leans), *not* popularity.
+place. Rank by **relative affordance** (how distinctively a place leans to each sub-dimension) instead of popularity. 
 ## Approach
 
 - **A 2021 snapshot, shown as popularity bands.** The reviews run up to 2021, and some places have changed or closed since. So the map shows a broad popularity band ("lots of visitors") rather than exact star ratings or review counts. Live details (hours, ratings, whether a place is still open) will come from the Google Places API in the app, not from this file.
