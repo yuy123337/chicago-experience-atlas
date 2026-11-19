@@ -1,4 +1,11 @@
-# Chicago — Experience Atlas
+
+
+# Chicago Good Life Atlas
+
+**[Explore the Interactive Map](https://goodlifeatlas.net)**
+
+An interactive map of Chicago that helps people discover places
+through the experiences visitors describe, beyond star ratings.
 
 *Hi! README is written the way I'd explain it to my collaborator(s): what it is, how the data works, how to keep it alive, and what I'm still working on.*
 
