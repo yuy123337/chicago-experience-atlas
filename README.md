@@ -6,13 +6,13 @@ An interactive map of Chicago places, curated by the *kind of inner experience* 
 
 ### A different way to experience Chicago
 
-We’re offering an **interactive map of Chicago** that helps you discover what you might find novel, interesting, or thought-provoking about a place—beyond its star rating.
+We want to offer **a different way to explore Chicago, beyond star ratings**. This interactive map draws on visitors’ own words to help you get a feel for a place—what they found interesting, what surprised them, and what stayed with them afterward.
 
-Drawing on how visitors narrate their experiences in their own words, the map offers **a way to consider what a place might open up for you**, helping you choose where to go based on the experiences you hope to have.
+It’s a way to choose where to go by considering **what an experience might open up for you**: a moment of joy, a meaningful connection, or something new that makes you think.
 
-Through your reflections, we also hope to explore a broader question:
+We’d love to hear about your experiences, too. Together, we hope to explore a broader question:
 
-> **What kinds of experiences does this place offer—happy, meaningful, or psychologically rich?**
+> **What kinds of experiences can a place offer—happy, meaningful, or psychologically rich?**
 
 
 ## How places get picked (the criteria — all in `build_chicago_site.py`)
