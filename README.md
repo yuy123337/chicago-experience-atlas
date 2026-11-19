@@ -1,27 +1,19 @@
 # Chicago — Experience Atlas
 
-*Hi! This is a research prototype, not a product — so this README is written the way I'd explain it
-to my collaborator(s): what it is, how the data works, how to keep it alive, and what I'm still worried about.*
+*Hi! README is written the way I'd explain it to my collaborator(s): what it is, how the data works, how to keep it alive, and what I'm still working on.*
 
-An interactive map of Chicago places, colored **not by star rating** but by the *kind of inner
-experience* a place tends to afford — **psychologically rich**, **happy**, or **meaningful**
-(Oishi & Westgate, 2022).
+An interactive map of Chicago places, curated by the *kind of inner experience* a place tends to afford — **psychologically rich**, **happy**, or **meaningful** (Oishi & Westgate, 2022)!
 
-From the perspective of the map users, * We're offering a **mental shortcut for
-deciding where to go**: a way to evaluate a place by the experience it tends to open up in you — read
-from how visitors narrate it, in their own words, and hopefully we can learn about a more general question: *"is this place provide happy, psychologically rich or meaningful experience?"
+### A different way to experience Chicago
 
----
+We’re offering an **interactive map of Chicago** that helps you discover what you might find novel, interesting, or thought-provoking about a place—beyond its star rating.
 
-## What is `data.js`? (read this first)
+Drawing on how visitors narrate their experiences in their own words, the map offers **a way to consider what a place might open up for you**, helping you choose where to go based on the experiences you hope to have.
 
-`data.js` is **not the raw data** — it's the small, baked file the website actually reads. It holds:
+Through your reflections, we also hope to explore a broader question:
 
-- `window.DATA` — for each construct (`rich`, `happy`, `meaning`, + 7 richness sub-dimensions), a list
-  of the **top recommended places**, each: `{name, cat, grp, lat, lon, score, rev, rating, url}`.
-- `window.ZIPXY` — a ZIP → coordinate lookup for the "Jump to ZIP" box.
+> **What kinds of experiences does this place offer—happy, meaningful, or psychologically rich?**
 
-It's a **curated slice**, not everything. It's generated from our scoring output — see below.
 
 ## How places get picked (the criteria — all in `build_chicago_site.py`)
 
